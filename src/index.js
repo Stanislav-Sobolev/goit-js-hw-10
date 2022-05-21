@@ -1,5 +1,6 @@
 import './css/styles.css';
 import { fetchCountries } from './fetchCountries';
+import { Notify } from 'notiflix/build/notiflix-notify-aio';
 let debounce = require('lodash.debounce');
 
 const countryList = document.querySelector(".country-list");
@@ -9,18 +10,63 @@ const DEBOUNCE_DELAY = 300;
 const input = document.querySelector('input#search-box');
 
 input.addEventListener('input', debounce(() => {
-    console.log('input.value :>> ', input.value);
-    if(input.value === "" || input.value === null){
+    
+    if(input.value === '' || input.value === null || input.value === ' ' ){
+
+        input.value = "";
         countryList.innerHTML = "";
         countryInfo.innerHTML = "";
         
     } else {
-        fetchCountries(input.value.trim());
-    }
+        fetchCountries(input.value.trim())
+        .then((status) => {
+    
+            if(status.status === 404){
+                Notify.failure("Oops, there is no country with that name");
+            }
+            return status;   
+            }) 
+        .then((result) => {
+            
+            if(result.length > 10){
+                Notify.info(
+                    "Too many matches found. Please enter a more specific name."
+                    );
+            } else {
+                creatingMarkup(result);
+                }
+            })
+        .catch((error) => {
+                countryList.innerHTML = "";
+                console.log("Это блок Catch!", error)
+            });
+        }
     
 }, DEBOUNCE_DELAY));
 
 
+function creatingMarkup(result) {
+    let allCountries = result.map((country) => {
+        return `<li><img src="${country.flags.svg}" width="20" height="auto" 
+                style="margin-right:5px" alt="${country.name.common}">${country.name.common}</li>`
+    }).join("");
+    
+    countryList.classList.remove("big-size-text");
+    countryInfo.innerHTML = "";
+    if(result.length === 1){
+        countryList.classList.add("big-size-text");
+        
+        const moreInfo = result.map((country) => {
+            return `<li class="more-info">
+            <p><b>Capital: </b>${country.capital}</p>
+            <p><b>Population: </b>${country.population}</p></li>
+            <p><b>Lenguages: </b>${Object.values(country.languages)}</p></li>`
+        }).join("");
+        
+        countryInfo.innerHTML = moreInfo;
+    }     
+countryList.innerHTML = allCountries;
+}
 
 
 
