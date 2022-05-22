@@ -19,13 +19,6 @@ input.addEventListener('input', debounce(() => {
         
     } else {
         fetchCountries(input.value.trim())
-        .then((status) => {
-    
-            if(status.status === 404){
-                Notify.failure("Oops, there is no country with that name");
-            }
-            return status;   
-            }) 
         .then((result) => {
             
             if(result.length > 10){
@@ -37,8 +30,9 @@ input.addEventListener('input', debounce(() => {
                 }
             })
         .catch((error) => {
+            Notify.failure("Oops, there is no country with that name");
                 countryList.innerHTML = "";
-                console.log("Это блок Catch!", error)
+                countryInfo.innerHTML = "";
             });
         }
     
