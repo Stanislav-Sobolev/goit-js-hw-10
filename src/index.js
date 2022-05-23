@@ -11,7 +11,7 @@ const input = document.querySelector('input#search-box');
 
 input.addEventListener('input', debounce(() => {
     
-    if(input.value === '' || input.value === null || input.value === ' ' ){
+    if(input.value.trim() === '' ){
 
         input.value = "";
         countryList.innerHTML = "";
@@ -33,6 +33,7 @@ input.addEventListener('input', debounce(() => {
             Notify.failure("Oops, there is no country with that name");
                 countryList.innerHTML = "";
                 countryInfo.innerHTML = "";
+                
             });
         }
     

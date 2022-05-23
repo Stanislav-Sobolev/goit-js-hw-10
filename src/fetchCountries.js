@@ -5,7 +5,7 @@ return fetch(`https://restcountries.com/v3.1/name/${name}`)
     if(res.ok) {
         return res.json();
     } else {
-        throw res;
+        throw new Error(res.status);
     }
     
 })
